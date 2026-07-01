@@ -1,0 +1,41 @@
+# ============================================================
+# Configuracao do pipeline de dados — Projeto Final (FIA/LABDATA)
+# Home Credit Default Risk | Ponto iii (ABT)
+# Centraliza caminhos, parametros e metadados usados por
+# data_sanitization.py (raw -> clean) e abt_transform.py (clean -> abt)
+# ============================================================
+
+project: "Home Credit Default Risk - Risco de Credito"
+
+# Caminhos relativos a raiz do projeto (pasta 'Projeto Final - TCC')
+paths:
+  raw:   "home-credit-default-risk/application_train.csv"   # base bruta (Kaggle)
+  clean: "Dados/clean_data.csv"                             # saida do data_sanitization
+  abt:   "Dados/abt.csv"                                    # saida do abt_transform
+
+columns:
+  id: "SK_ID_CURR"        # chave do cliente/solicitacao
+  target: "TARGET"        # 1 = inadimplente, 0 = adimplente
+
+# ---------- Parametros da etapa de limpeza ----------
+sanitization:
+  # Valor sentinela (~1000 anos) que significa "nao se aplica" -> vira NaN
+  days_employed_sentinel: 365243
+  # Categorias invalidas tratadas como ausentes
+  xna_to_nan: ["CODE_GENDER", "ORGANIZATION_TYPE"]
+  # Renda absurda (outlier conhecido) acima deste corte -> NaN (sera imputada)
+  income_cap: 100000000      # 100 mi
+
+# ---------- Parametros da construcao da ABT ----------
+abt:
+  null_drop_threshold: 0.60      # descarta colunas com mais de 60% de nulos
+  onehot_max_cardinality: 12     # categorica com ate 12 niveis -> one-hot
+  # categoricas de alta cardinalidade -> frequency encoding (evita explodir colunas)
+  freq_encode_cols: ["ORGANIZATION_TYPE", "OCCUPATION_TYPE"]
+  numeric_impute: "median"       # estrategia de imputacao numerica
+  cast_float32: true             # reduz memoria/tamanho do arquivo
+
+metadata:
+  autor: "Daniel"
+  etapa_crisp_dm: "Data Preparation (ABT)"
+  descricao: "Visao analitica em granularidade de solicitacao de credito, pronta para modelagem de classificacao binaria."
