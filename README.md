@@ -76,23 +76,74 @@ O objetivo deste projeto é desenvolver uma solução baseada em Machine Learnin
 | 📁 **Dados/clean_data.csv**                 | Dados tratados e prontos para geração da ABT.                     |
 | 📁 **Dados/abt.csv**                        | Dados tratados e prontos para utilização nos modelos.             |
 | 🛠️ **DataPipeline/1_data_sanitization.py** | Scripts de leitura, limpeza e preparação dos dados.               |
-| 📑 **DataPipeline/2_abt_transform.py**              | Scripts responsáveis pela engenharia e seleção de atributos.      |
-| ⚙️ **DataPipeline/config.yaml**                     | Arquivo de configuração para os arquivos em DataPipeline.         |
+| 📑 **DataPipeline/2_abt_transform.py**      | Scripts responsáveis pela engenharia e seleção de atributos.      |
+| 📊 **DataPipeline/exp_analysis**            | Notebooks de exploração dos dados, experimentos e análises.       |
+| ⚙️ **DataPipeline/config.yaml**             | Arquivo de configuração para os arquivos em DataPipeline.         |
 | 🔧 **DataValidator/validator.py**           | Classes do Pydantic e validação dos contratos de dados esperados. |
 | 💾 **Model/3_train.py**                     | Script para treinamento, validação e salvamento dos modelos.      |
 | 📓 **Model/4_evaluation.ipynb**             | Notebooks de exploração dos dados, experimentos e análises.       |
 | 🤖 **Model/credit_policy.py**               | Script com a politica de crédito que será utilizada.              |
 | ⚙️ **Model/config.yaml**                    | Arquivo de configuração do modelo.                                |
-| 📊 **exp_analysis**                         | Notebooks de exploração dos dados, experimentos e análises.       |
 | 📑 **requirements.txt**                     | Métricas e resultados dos experimentos.                           |
-
 ---
+
+
+## 🔄 Fluxo dos Dados
+
+O projeto segue um pipeline estruturado para transformar os dados brutos em uma recomendação de crédito baseada em Machine Learning.
+
+```text
+application_train.csv (Kaggle)
+              │
+              ▼
+1_data_sanitization.py
+- Validação dos dados (Pydantic)
+- Limpeza e padronização
+- Tratamento de valores ausentes
+- Remoção de inconsistências
+              │
+              ▼
+clean_data.csv
+              │
+              ▼
+2_abt_transform.py
+- Engenharia de atributos
+- Seleção de variáveis
+- Encoding das variáveis categóricas
+- Imputação de valores faltantes
+              │
+              ▼
+abt.csv
+              │
+              ▼
+3_train.py
+- Divisão treino/teste
+- Treinamento dos modelos
+- Avaliação (ROC-AUC, KS e Gini)
+- Seleção do melhor modelo
+              │
+              ▼
+model_pd.pkl
+metrics.json
+test_predictions.csv
+              │
+              ▼
+credit_policy.py
+- Estima a Probabilidade de Default (PD)
+- Classifica o cliente por faixa de risco
+- Calcula o limite de crédito recomendado
+- Define o prazo máximo da operação
+              │
+              ▼
+Decisão Final de Crédito
+(Aprovar, Limite e Prazo)
+```
 
 # 🗃️ Base de Dados
 
-Descreva a base de dados utilizada.
-
-**Exemplo:**
+O projeto utiliza a base pública Home Credit Default Risk, disponibilizada no Kaggle.
+A base contém aproximadamente 307 mil solicitações de crédito com informações cadastrais, financeiras e comportamentais dos clientes.
+O objetivo é prever a probabilidade de inadimplência (TARGET), permitindo apoiar a definição do limite de crédito adequado para novos clientes.
 
 A base contém informações como:
 
@@ -126,22 +177,19 @@ O projeto foi desenvolvido seguindo as seguintes etapas:
 # 🤖 Modelos Avaliados
 
 - 📉 Regressão Logística
-- 🌳 Decision Tree
-- 🌲 Random Forest
-- 🚀 XGBoost
-- ⚡ LightGBM
+- 🌲 HistGradientBoosting (Modelo Principal)
 
 ---
 
 # 📏 Métricas Utilizadas
 
-- ✅ Accuracy
-- 🎯 Precision
-- 🔎 Recall
+- 📈 ROC-AUC 
+- 📏 KS (Kolmogorov-Smirnov) 
+- 📊 Gini 
+- 🧩 Matriz de Confusão 
+- 🎯 Precision 
+- 🔎 Recall 
 - ⚖️ F1-Score
-- 📈 ROC-AUC
-- 📉 Matriz de Confusão
-
 ---
 
 # 🛠️ Tecnologias Utilizadas
@@ -151,9 +199,10 @@ O projeto foi desenvolvido seguindo as seguintes etapas:
 - 🔢 NumPy
 - 🤖 Scikit-Learn
 - 📊 Matplotlib
-- 📈 Seaborn
-- 🚀 XGBoost
-- ⚡ LightGBM
+- 📄 PyYAML
+- 💾 Joblib
+- ✅ Pydantic
+
 
 ---
 
@@ -163,7 +212,6 @@ O projeto foi desenvolvido seguindo as seguintes etapas:
 
 ```bash
 git clone <url-do-repositorio>
-
 cd projeto-final-fia
 ```
 
@@ -175,7 +223,6 @@ cd projeto-final-fia
 
 ```bash
 python -m venv venv
-
 venv\Scripts\activate
 ```
 
@@ -183,7 +230,6 @@ venv\Scripts\activate
 
 ```bash
 python3 -m venv venv
-
 source venv/bin/activate
 ```
 
@@ -197,26 +243,69 @@ pip install -r requirements.txt
 
 ---
 
+# 📊 Gerando a ABT
 
-##  Gerando a ABT
-1. Crie uma pasta na raiz do repositório com o nome `home-credit-default-risk`
-2. Baixe o arquivo `application_train.csv` no link `https://www.kaggle.com/competitions/home-credit-default-risk/overview`
-3. Execute o script de limpeza dos dados:
+## 1️⃣ Crie a pasta do dataset
 
-```bash
-python DataPipeline/1_data_sanitization.py
-```
-4. Execute o script de criação da ABT.
-```bash
-python DataPipeline/2_abt_transform.py
+Na raiz do projeto, crie uma pasta chamada:
+
+```text
+home-credit-default-risk
 ```
 
+---
+
+## 2️⃣ Baixe o dataset
+
+Faça o download do arquivo:
+
+```text
+application_train.csv
+```
+
+Disponível na competição **Home Credit Default Risk** do Kaggle.
+
+---
+
+## 3️⃣ Coloque o arquivo na pasta criada
+
+A estrutura deverá ficar assim:
+
+```text
+projeto-final-fia/
+│
+├── home-credit-default-risk/
+│   └── application_train.csv
+│
+├── DataPipeline/
+├── Model/
+├── Dados/
+└── ...
+```
+
+---
+
+## 4️⃣ Execute a limpeza dos dados
+
+```bash
+python -m DataPipeline/1_data_sanitization.py
+```
+
+---
+
+## 5️⃣ Gere a ABT (Analytical Base Table)
+
+```bash
+python -m DataPipeline/2_abt_transform.py
+```
+
+Ao final da execução, a ABT será gerada na pasta de saída do projeto e estará pronta para utilização na etapa de treinamento do modelo.
 # 🏋️ Como Treinar o Modelo
 
 Execute:
 
 ```bash
-python Model/3_train.py
+python -m Model/3_train.py
 ```
 
 O modelo treinado será salvo em:
@@ -239,21 +328,23 @@ Rode o arquivo:
 
 # 🏅 Resultados
 
-| Modelo | ROC-AUC | Recall | Precision |
-|---------|:------:|:------:|:---------:|
-| Regressão Logística | 0.74 | 0.63 | 0.70 |
-| Random Forest | 0.79 | 0.71 | 0.74 |
-| XGBoost | **0.82** | **0.76** | **0.78** |
+
+| Modelo               | ROC-AUC    | KS         | Gini       |
+| -------------------- | ---------- | ---------- | ---------- |
+| Logistic Regression  | 0.7501     | 0.3707     | 0.5002     |
+| HistGradientBoosting | **0.7659** | **0.3976** | **0.5319** |
 
 ---
 
 # ⭐ Melhor Modelo
 
-Descreva o modelo escolhido e o motivo.
+O modelo HistGradientBoosting apresentou o melhor desempenho, alcançando:
 
-**Exemplo:**
+- ROC-AUC: 0.7659
+- KS: 0.3976
+- Gini: 0.5319
 
-O modelo **XGBoost** apresentou o melhor desempenho considerando as métricas ROC-AUC e Recall, sendo selecionado como modelo final por apresentar maior capacidade de identificar clientes inadimplentes.
+Por esse motivo foi selecionado como modelo final para estimar a Probabilidade de Default (PD), utilizada posteriormente pela política de concessão de crédito.
 
 ---
 
@@ -263,7 +354,7 @@ O modelo **XGBoost** apresentou o melhor desempenho considerando as métricas RO
 
 **Daniel Azevedo**
 
-**Elizabeth**
+**Elizabeth Oliveira**
 
 📚 Pós Graduação em Engenharia de Dados
 
