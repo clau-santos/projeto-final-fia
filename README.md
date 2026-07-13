@@ -49,16 +49,16 @@ O objetivo deste projeto é desenvolver uma solução baseada em Machine Learnin
 │   └── 📄 abt.csv
 │
 ├── 📁 DataPipeline/
-│   ├── 📄 1_data_sanitization.py
-│   ├── 📄 2_abt_transform.py
+│   ├── 📄 data_sanitization.py
+│   ├── 📄 abt_transform.py
 │   ├── 📄 config.yaml
 │
 ├── 📁 DataValidator/
 │   ├── 📄 validator.py
 
 ├── 📁 model/
-│   ├── 📄 3_train.py
-│   ├── 📄 4_evaluation.ipynb
+│   ├── 📄 train.py
+│   ├── 📄 evaluation.ipynb
 │   ├── 📄 config.yaml
 │   ├── 📄 credit_policy.py
 
@@ -70,21 +70,21 @@ O objetivo deste projeto é desenvolver uma solução baseada em Machine Learnin
 
 ## 📁 Descrição dos Diretórios
 
-| Diretório/Arquivo                           | Descrição                                                         |
-|---------------------------------------------|-------------------------------------------------------------------|
-| 📁 **Dados/raw.csv**                        | Dados originais obtidos da fonte, sem qualquer tratamento.        |
-| 📁 **Dados/clean_data.csv**                 | Dados tratados e prontos para geração da ABT.                     |
-| 📁 **Dados/abt.csv**                        | Dados tratados e prontos para utilização nos modelos.             |
-| 🛠️ **DataPipeline/1_data_sanitization.py** | Scripts de leitura, limpeza e preparação dos dados.               |
-| 📑 **DataPipeline/2_abt_transform.py**      | Scripts responsáveis pela engenharia e seleção de atributos.      |
-| 📊 **DataPipeline/exp_analysis**            | Notebooks de exploração dos dados, experimentos e análises.       |
-| ⚙️ **DataPipeline/config.yaml**             | Arquivo de configuração para os arquivos em DataPipeline.         |
-| 🔧 **DataValidator/validator.py**           | Classes do Pydantic e validação dos contratos de dados esperados. |
-| 💾 **Model/3_train.py**                     | Script para treinamento, validação e salvamento dos modelos.      |
-| 📓 **Model/4_evaluation.ipynb**             | Notebooks de exploração dos dados, experimentos e análises.       |
-| 🤖 **Model/credit_policy.py**               | Script com a politica de crédito que será utilizada.              |
-| ⚙️ **Model/config.yaml**                    | Arquivo de configuração do modelo.                                |
-| 📑 **requirements.txt**                     | Métricas e resultados dos experimentos.                           |
+| Diretório/Arquivo                   | Descrição                                                         |
+|-------------------------------------|-------------------------------------------------------------------|
+| 📁 **Dados/raw.csv**                | Dados originais obtidos da fonte, sem qualquer tratamento.        |
+| 📁 **Dados/clean_data.csv**         | Dados tratados e prontos para geração da ABT.                     |
+| 📁 **Dados/abt.csv**                | Dados tratados e prontos para utilização nos modelos.             |
+| 🛠️ **DataPipeline/data_sanitization.py** | Scripts de leitura, limpeza e preparação dos dados.               |
+| 📑 **DataPipeline/abt_transform.py** | Scripts responsáveis pela engenharia e seleção de atributos.      |
+| 📊 **DataPipeline/exp_analysis**    | Notebooks de exploração dos dados, experimentos e análises.       |
+| ⚙️ **DataPipeline/config.yaml**     | Arquivo de configuração para os arquivos em DataPipeline.         |
+| 🔧 **DataValidator/validator.py**   | Classes do Pydantic e validação dos contratos de dados esperados. |
+| 💾 **Model/train.py**               | Script para treinamento, validação e salvamento dos modelos.      |
+| 📓 **Model/evaluation.ipynb**       | Notebooks de exploração dos dados, experimentos e análises.       |
+| 🤖 **Model/credit_policy.py**       | Script com a politica de crédito que será utilizada.              |
+| ⚙️ **Model/config.yaml**            | Arquivo de configuração do modelo.                                |
+| 📑 **requirements.txt**             | Métricas e resultados dos experimentos.                           |
 ---
 
 
@@ -288,7 +288,7 @@ projeto-final-fia/
 ## 4️⃣ Execute a limpeza dos dados
 
 ```bash
-python -m DataPipeline/1_data_sanitization.py
+python -m DataPipeline/data_sanitization.py
 ```
 
 ---
@@ -296,7 +296,7 @@ python -m DataPipeline/1_data_sanitization.py
 ## 5️⃣ Gere a ABT (Analytical Base Table)
 
 ```bash
-python -m DataPipeline/2_abt_transform.py
+python -m DataPipeline/abt_transform.py
 ```
 
 Ao final da execução, a ABT será gerada na pasta de saída do projeto e estará pronta para utilização na etapa de treinamento do modelo.
@@ -305,7 +305,7 @@ Ao final da execução, a ABT será gerada na pasta de saída do projeto e estar
 Execute:
 
 ```bash
-python -m Model/3_train.py
+python -m Model/train.py
 ```
 
 O modelo treinado será salvo em:

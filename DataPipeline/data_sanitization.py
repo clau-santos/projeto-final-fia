@@ -23,7 +23,6 @@ import numpy as np
 import pandas as pd
 import yaml
 
-
 from DataValidator.validator import data_validator
 
 # ----- localizar raiz do projeto e carregar config -----
@@ -38,24 +37,22 @@ ID    = CFG["target_columns"]["id"]
 SAN   = CFG["sanitization"]
 
 
-def main():
+def _read_data() -> pd.DataFrame:
+    """
+    Função responsável por ler o arquivo raw
+    """
     if not RAW.exists():
         sys.exit(f"[ERRO] Base bruta nao encontrada: {RAW}\n"
                  f"Ajuste 'paths.raw' no config.yaml.")
 
     print(f"[1/8] Lendo base bruta: {RAW.name}")
     df = pd.read_csv(RAW)
+    return df
 
-    print(f"[2/8 Iniciando validação do contrato de dados da camada RAW: {RAW.name}")
-
-    records = df.replace({np.nan: None}).to_dict(orient="records")
-    data_validator(data=records, model="RAW")
-
-    print(f"[3/8] Lendo base bruta: {RAW.name}")
-
-    n0, c0 = df.shape
-    print(f"      -> {n0:,} linhas x {c0} colunas")
-
+def _data_transform(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Função responsável por realizar a limpeza/tratamento dos dados.
+    """
     # 2. Sentinela de DAYS_EMPLOYED -> NaN (+ flag)
     sent = SAN["days_employed_sentinel"]
     mask = df["DAYS_EMPLOYED"] == sent
@@ -86,12 +83,32 @@ def main():
     dup = int(df.duplicated(subset=[ID]).sum())
     df = df.drop_duplicates(subset=[ID])
     print(f"[7/8] Duplicatas por {ID} removidas: {dup:,}")
+    return df
 
+
+def _data_validation(df: pd.DataFrame, model: str) -> None:
+    """
+    Funcão responsável por realizar a validação do contrato de dados
+    """
+    records = df.replace({np.nan: None}).to_dict(orient="records")
+    data_validator(data=records, model=model)
+
+def main():
+    df = _read_data()
+
+    print(f"[2/8 Iniciando validação do contrato de dados da camada RAW: {RAW.name}")
+    _data_validation(df=df, model="RAW")
+
+    print(f"[3/8] Lendo base bruta: {RAW.name}")
+
+    n0, c0 = df.shape
+    print(f"      -> {n0:,} linhas x {c0} colunas")
+
+    df = _data_transform(df=df)
     CLEAN.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"[8/8 Iniciando validação do contrato de dados para os dados da camada SILVER.")
-    clean_data = df.replace({np.nan: None}).to_dict(orient="records")
-    data_validator(data=clean_data, model="SILVER")
+    _data_validation(df=df, model="SILVER")
 
     df.to_csv(CLEAN, index=False)
     print(f"\n[OK] clean_data salvo em: {CLEAN}")

@@ -1,6 +1,6 @@
     # -*- coding: utf-8 -*-
 """
-3_train.py — Treina o modelo de Probabilidade de Default (PD).
+train.py — Treina o modelo de Probabilidade de Default (PD).
 Projeto Final FIA/LABDATA — Sistema Inteligente de Limite de Credito (Dia 3).
 
 Entrada : Dados/abt.csv (ABT pronta, 100% numerica)
@@ -17,7 +17,7 @@ Fluxo:
   4. Avalia no teste (AUC, KS, Gini) e escolhe o de maior AUC.
   5. Salva o melhor modelo, as metricas e as predicoes de teste.
 
-Uso:  python 3_train.py
+Uso:  python train.py
 Requer: scikit-learn, pandas, numpy, joblib, pyyaml  (ver requirements.txt)
 """
 from pathlib import Path

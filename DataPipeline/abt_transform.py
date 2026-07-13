@@ -58,16 +58,17 @@ def engenharia_atributos(df: pd.DataFrame) -> pd.DataFrame:
     df["EXT_SOURCE_MAX"]  = df[ext].max(axis=1)
     return df
 
-
-def main():
+def read_clean_data():
     if not CLEAN_DATA_PATH.exists():
         sys.exit(f"[ERRO] clean_data nao encontrado: {CLEAN_DATA_PATH}\n"
                  f"Rode antes: python data_sanitization.py")
 
     print(f"[1/7] Lendo base limpa: {CLEAN_DATA_PATH.name}")
     df = pd.read_csv(CLEAN_DATA_PATH)
-    print(f"      -> {df.shape[0]:,} linhas x {df.shape[1]} colunas")
+    return df
 
+
+def abt_transform(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     # guardar id e alvo, trabalhar nas features
     y  = df[TARGET_COLUMNS["target"]]
     ids = df[TARGET_COLUMNS["id"]]
@@ -124,6 +125,13 @@ def main():
     # 6. Montar ABT final = ID + TARGET + features
     abt = pd.concat([ids.reset_index(drop=True), y.reset_index(drop=True),
                      model_data.reset_index(drop=True)], axis=1)
+    return abt, y
+
+def main():
+    df = read_clean_data()
+    print(f"      -> {df.shape[0]:,} linhas x {df.shape[1]} colunas")
+
+    abt, y = abt_transform(df=df)
     ABT_PATH.parent.mkdir(parents=True, exist_ok=True)
     abt.to_csv(ABT_PATH, index=False)
 
