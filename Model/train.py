@@ -104,6 +104,8 @@ def main():
         "hist_gradient_boosting": {"auc": round(auc_hgb, 4), "ks": round(ks_hgb, 4), "gini": round(gini_hgb, 4)},
         "n_treino": int(len(Xtr)), "n_teste": int(len(Xte)),
         "taxa_inadimplencia": round(float(y.mean()), 4),
+        "features": list(X.columns),
+        "defaults": X.median(numeric_only=True).to_dict(),
     }
 
     # importancia por permutacao (top 15) numa subamostra do teste

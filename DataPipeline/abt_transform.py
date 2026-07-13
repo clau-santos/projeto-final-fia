@@ -72,14 +72,40 @@ def abt_transform(df: pd.DataFrame) -> tuple[pd.DataFrame, pd.Series]:
     # guardar id e alvo, trabalhar nas features
     y  = df[TARGET_COLUMNS["target"]]
     ids = df[TARGET_COLUMNS["id"]]
+
+    keep_columns = [
+        "DAYS_BIRTH",
+        "DAYS_EMPLOYED",
+        "AMT_INCOME_TOTAL",
+        "AMT_CREDIT",
+        "AMT_GOODS_PRICE",
+        "CNT_FAM_MEMBERS",
+        "AMT_ANNUITY",
+        "EXT_SOURCE_1",
+        "EXT_SOURCE_2",
+        "EXT_SOURCE_3",
+        "CODE_GENDER",
+        "FLAG_OWN_CAR",
+        "FLAG_OWN_REALTY",
+        "CNT_CHILDREN",
+        "NAME_INCOME_TYPE",
+        "NAME_FAMILY_STATUS",
+        "NAME_EDUCATION_TYPE",
+        TARGET_COLUMNS["target"],
+        TARGET_COLUMNS["id"]
+    ]
+
+    df = df[keep_columns]
+
     model_data  = df.drop(columns=[TARGET_COLUMNS["id"], TARGET_COLUMNS["target"]])
 
     # 1. Descartar colunas muito vazias
     thr = ABT_PARAMETERS["null_drop_threshold"]
     null_ratio = model_data.isna().mean()
-    drop_cols = null_ratio[null_ratio > thr].index.tolist()
-    model_data = model_data.drop(columns=drop_cols)
-    print(f"[2/7] Colunas descartadas por >{thr:.0%} nulos: {len(drop_cols)}")
+    if null_ratio.isna().any():
+        drop_cols = null_ratio[null_ratio > thr].index.tolist()
+        model_data = model_data.drop(columns=drop_cols)
+        print(f"[2/7] Colunas descartadas por >{thr:.0%} nulos: {len(drop_cols)}")
 
     # 2. Engenharia de atributos
     model_data = engenharia_atributos(model_data)

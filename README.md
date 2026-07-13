@@ -330,9 +330,9 @@ Rode o arquivo:
 
 
 | Modelo               | ROC-AUC    | KS         | Gini       |
-| -------------------- | ---------- | ---------- | ---------- |
-| Logistic Regression  | 0.7501     | 0.3707     | 0.5002     |
-| HistGradientBoosting | **0.7659** | **0.3976** | **0.5319** |
+| -------------------- |------------|------------| ---------- |
+| Logistic Regression  | 0.7452     | 0.3658     | 0.4903    |
+| HistGradientBoosting | **0.7622** | **0.3900** | **0.5244** |
 
 ---
 
@@ -340,9 +340,9 @@ Rode o arquivo:
 
 O modelo HistGradientBoosting apresentou o melhor desempenho, alcançando:
 
-- ROC-AUC: 0.7659
-- KS: 0.3976
-- Gini: 0.5319
+- ROC-AUC: 0.7622
+- KS: 0.3900
+- Gini: 0.5244
 
 Por esse motivo foi selecionado como modelo final para estimar a Probabilidade de Default (PD), utilizada posteriormente pela política de concessão de crédito.
 
